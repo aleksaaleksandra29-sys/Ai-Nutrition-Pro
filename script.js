@@ -101,19 +101,28 @@ function updateDisplay() {
     let filtered = foodLog;
     if(currentPeriod.type !== 'all') {
         filtered = foodLog.filter(item => {
-            const d = new Date(item.date);
+            const d = new Date(item.date + 'T00:00:00');
             return d >= currentPeriod.start && d <= currentPeriod.end;
         });
     }
     filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-    let daysCount = 1;
-    if (currentPeriod.type === 'all') {
-        const dates = new Set(filtered.map(i => i.date));
-        daysCount = dates.size || 1;
-    } else if (currentPeriod.type !== 'day') {
-        const diff = Math.abs(currentPeriod.end - currentPeriod.start);
-        daysCount = Math.ceil(diff / (1000 * 60 * 60 * 24)) || 1; 
+	let daysCount = 1;
+    const dates = new Set(filtered.map(i => i.date));
+    const actualDays = dates.size || 1;
+    const daysInMonth = new Date(currentPeriod.start.getFullYear(), currentPeriod.start.getMonth() + 1, 0).getDate();
+
+    if (currentPeriod.type === 'week' && actualDays >= 7) 
+	{
+        daysCount = 7;
+    } 
+	else if (currentPeriod.type === 'month' && actualDays >= daysInMonth) 
+	{
+        daysCount = daysInMonth;
+    } 
+	else 
+	{
+        daysCount = currentPeriod.type === 'day' ? 1 : actualDays;
     }
 
     document.getElementById('statsInfo').textContent = currentPeriod.type === 'day' ? "Данные за один день" : `Среднее за ${daysCount} дн.`;
@@ -130,8 +139,9 @@ function updateDisplay() {
     updateBar('cal', avgs.cal, GOALS.cal); updateBar('prot', avgs.prot, GOALS.prot); updateBar('fat', avgs.fat, GOALS.fat); updateBar('carb', avgs.carb, GOALS.carb);
 
     document.getElementById('val_gl').textContent = Math.round(avgs.gl);
-    const na = avgs.micros["Натрий (мг)"] || 0; const k = avgs.micros["Калий (мг)"] || 1; const nak = na / k;
-    const nakEl = document.getElementById('val_nak'); nakEl.textContent = nak.toFixed(2); nakEl.style.color = nak > 0.6 ? '#e74c3c' : '#27ae60';
+    const na = avgs.micros["Натрий (мг)"] || 0; const k = avgs.micros["Калий (мг)"] || 1; 
+	const nak = k > 0 ? (na / k).toFixed(2) : '—';
+    const nakEl = document.getElementById('val_nak'); nakEl.textContent = nak; nakEl.style.color = nak > 0.6 ? '#e74c3c' : '#27ae60';
     const ca = avgs.micros["Кальций (мг)"] || 0; const mg = avgs.micros["Магний (мг)"] || 1;
     document.getElementById('val_camg').textContent = (ca / mg).toFixed(2);
 
