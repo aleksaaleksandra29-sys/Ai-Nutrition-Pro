@@ -207,17 +207,21 @@ function renderList(items) {
     items.forEach(item => {
         let microStr = item.micros ? Object.entries(item.micros).sort((a,b) => b[1] - a[1]).slice(0, 3).map(([k,v]) => `${k.split(' ')[0]} ${v}`).join(', ') : '';
         const tr = document.createElement('tr');
+        
+        // Добавляем data-label для каждой ячейки, чтобы в CSS они подписались на мобильных
         tr.innerHTML = `
-            <td style="color:#2980b9; font-size:12px; cursor:pointer; font-weight:bold" onclick="editDateItem(${item.id})" title="Нажми, чтобы изменить дату">✎ ${item.date}</td>
-            <td style="font-weight:600">${item.name}</td>
-            <td>${Math.round(item.cal)}</td>
-            <td style="font-size:12px">${Math.round(item.prot)} / ${Math.round(item.fat)} / ${Math.round(item.carb)}</td>
-            <td style="font-size:11px; color:#777">${microStr}...</td>
+            <td data-label="Дата" style="color:#2980b9; cursor:pointer; font-weight:bold" onclick="editDateItem(${item.id})">✎ ${item.date}</td>
+            <td data-label="Продукт" style="font-weight:600">${item.name}</td>
+            <td data-label="Ккал">${Math.round(item.cal)}</td>
+            <td data-label="Б / Ж / У" style="font-size:12px">${Math.round(item.prot)} / ${Math.round(item.fat)} / ${Math.round(item.carb)}</td>
+            <td data-label="Состав">${microStr}...</td>
             <td><button class="trash-btn" onclick="deleteItem(${item.id})">✕</button></td>
         `;
         el.appendChild(tr);
     });
 }
+
+/* ... (весь остальной код без изменений) ... */
 
 // --- УПРАВЛЕНИЕ ДАННЫМИ ---
 function deleteItem(id) {
