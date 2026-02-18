@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Nutrition Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>🥦 Моё Питание — Умный контроль</h1>
+    
+    <!-- Панель управления периодами -->
+    <div class="period-filters">
+        <div class="quick-periods">
+            <button class="period-btn active" onclick="setPeriod('day')">День</button>
+            <button class="period-btn" onclick="setPeriod('week')">Неделя</button>
+            <button class="period-btn" onclick="setPeriod('month')">Месяц</button>
+            <button class="period-btn" onclick="setPeriod('all')">Всё время</button>
+        </div>
+        
+        <div class="period-navigation">
+            <button onclick="navigatePeriod(-1)">◄</button>
+            <span id="periodLabel" style="font-weight: bold; min-width: 180px; text-align: center;">Сегодня</span>
+            <button onclick="navigatePeriod(1)">►</button>
+        </div>
+
+        <div class="action-buttons">
+            <button onclick="openAiModal()" class="ai-btn">🤖 Импорт (AI)</button>
+            <button onclick="exportData()" class="export-btn">💾 Бэкап</button>
+        </div>
+    </div>
+
+    <!-- Инфо-строка -->
+    <div id="statsInfo" class="info-bar">Показаны данные за сегодня</div>
+
+    <!-- Макросы (КБЖУ) -->
+    <div class="summary-grid">
+        <div class="summary-item cal-item">
+            <div class="label">Калории</div>
+            <div class="value"><span id="val_cal">0</span> / <span class="goal">2500</span></div>
+            <div class="progress"><div id="bar_cal" style="width: 0%"></div></div>
+        </div>
+        <div class="summary-item">
+            <div class="label">Белки</div>
+            <div class="value"><span id="val_prot">0</span> / <span class="goal">160г</span></div>
+            <div class="progress"><div id="bar_prot" class="p-fill" style="width: 0%"></div></div>
+        </div>
+        <div class="summary-item">
+            <div class="label">Жиры</div>
+            <div class="value"><span id="val_fat">0</span> / <span class="goal">80г</span></div>
+            <div class="progress"><div id="bar_fat" class="f-fill" style="width: 0%"></div></div>
+        </div>
+        <div class="summary-item">
+            <div class="label">Углеводы</div>
+            <div class="value"><span id="val_carb">0</span> / <span class="goal">300г</span></div>
+            <div class="progress"><div id="bar_carb" class="c-fill" style="width: 0%"></div></div>
+        </div>
+    </div>
+
+    <!-- Сетка микроэлементов -->
+    <div class="micros-container">
+        <!-- Витамины -->
+        <div class="section">
+            <h2>💊 Витамины</h2>
+            <div class="micro-grid" id="vitaminsGrid"></div>
+        </div>
+
+        <!-- Минералы -->
+        <div class="section">
+            <h2>💎 Минералы</h2>
+            <div class="micro-grid" id="mineralsGrid"></div>
+        </div>
+    </div>
+
+    <!-- Таблица продуктов -->
+    <div class="section">
+        <h2>🍽 Журнал приемов пищи</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Продукт</th>
+                    <th>Ккал</th>
+                    <th>Б / Ж / У</th>
+                    <th>Состав (топ)</th>
+                    <th style="width: 40px;"></th>
+                </tr>
+            </thead>
+            <tbody id="foodList"></tbody>
+        </table>
+    </div>
+
+    <!-- Модальное окно AI -->
+    <div id="aiModal" class="modal">
+        <div class="modal-content">
+            <h2>Добавить через AI</h2>
+            <p class="modal-hint">Скопируйте промпт, отправьте в чат, вставьте ответ JSON.</p>
+            
+            <!-- Добавлено поле выбора даты -->
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 13px; font-weight: bold; color: #555;">Дата записи:</label>
+                <input type="date" id="aiDateInput" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+
+            <button onclick="copyPrompt()" class="copy-btn">📋 Скопировать Промпт</button>
+            <textarea id="aiInput" placeholder="Вставьте JSON массив сюда..."></textarea>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="cancel-btn">Отмена</button>
+                <button onclick="processAiData()" class="save-btn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
