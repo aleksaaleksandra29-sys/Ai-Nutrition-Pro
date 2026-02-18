@@ -63,6 +63,34 @@
         </div>
     </div>
 
+    <!-- Индексы здоровья (НОВОЕ) -->
+    <div class="section">
+        <h2>🧬 Индексы здоровья</h2>
+        <div class="summary-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 0;">
+            <div class="summary-item">
+                <div class="label">Гликем. нагрузка</div>
+                <div class="value" id="val_gl">0</div>
+                <div class="goal">Цель: < 80</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Na / K (Баланс)</div>
+                <div class="value" id="val_nak">0</div>
+                <div class="goal">Цель: < 0.6</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Ca / Mg (Баланс)</div>
+                <div class="value" id="val_camg">0</div>
+                <div class="goal">Цель: ~ 2.0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детальный состав (НОВОЕ) -->
+    <div class="section">
+        <h2>🧪 Детальный состав</h2>
+        <div class="micro-grid" id="compositionGrid"></div>
+    </div>
+
     <!-- Сетка микроэлементов -->
     <div class="micros-container">
         <!-- Витамины -->
@@ -102,7 +130,6 @@
             <h2>Добавить через AI</h2>
             <p class="modal-hint">Скопируйте промпт, отправьте в чат, вставьте ответ JSON.</p>
             
-            <!-- Добавлено поле выбора даты -->
             <div style="margin-bottom: 10px;">
                 <label style="font-size: 13px; font-weight: bold; color: #555;">Дата записи:</label>
                 <input type="date" id="aiDateInput" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
