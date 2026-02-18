@@ -42,14 +42,31 @@ const GOALS = {
     }
 };
 
-let foodLog = [];
+let foodLog = []; // Глобальная переменная, доступная для cloud.js
 let currentPeriod = { type: 'day', start: null, end: null };
 
-function getLocalISODate(dateObj = new Date()) {
-    const offset = dateObj.getTimezoneOffset() * 60000; 
-    const localDate = new Date(dateObj.getTime() - offset);
-    return localDate.toISOString().split('T')[0];
+function init() {
+    console.log("Запуск основной инициализации...");
+    
+    // Загрузка локальных данных
+    let saved = localStorage.getItem('nutritionData_v4');
+    if(saved) { 
+        try { foodLog = JSON.parse(saved); } catch(e) { console.error(e); } 
+    }
+    
+    setPeriod('day');
+
+    // ПРИНУДИТЕЛЬНЫЙ ЗАПУСК ОБЛАКА
+    if (window.Cloud) {
+        console.log("Объект Cloud найден, запускаю Cloud.init()");
+        Cloud.init();
+    } else {
+        console.error("Объект Cloud НЕ НАЙДЕН. Проверь подключение cloud.js");
+    }
 }
+
+// Запуск приложения
+document.addEventListener('DOMContentLoaded', init);
 
 function getStartOfDay(d) { let n = new Date(d); n.setHours(0,0,0,0); return n; }
 function getEndOfDay(d) { let n = new Date(d); n.setHours(23,59,59,999); return n; }
@@ -215,13 +232,32 @@ function renderList(items) {
     });
 }
 
-function save() { localStorage.setItem('nutritionData_v4', JSON.stringify(foodLog)); updateDisplay(); }
-function deleteItem(id) { if(confirm('Удалить?')) { foodLog = foodLog.filter(i => i.id !== id); save(); } }
+function save() 
+{ 
+    // 1. Сохраняем локально (моментально)
+    localStorage.setItem('nutritionData_v4', JSON.stringify(foodLog)); 
+    updateDisplay();
+
+    // 2. Говорим облаку: "Данные изменились, сохрани когда будет удобно"
+    Cloud.scheduleSave(); 
+}
+
+function deleteItem(id) { 
+    if(confirm('Удалить?')) { 
+        foodLog = foodLog.filter(i => i.id !== id); 
+        save(); // Это вызовет и Cloud.scheduleSave()
+    }
+}
+
 function editDateItem(id) {
     const item = foodLog.find(i => i.id === id); if (!item) return;
     const newDate = prompt("Дата (ГГГГ-ММ-ДД):", item.date);
-    if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate)) { item.date = newDate; save(); }
+    if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate)) { 
+        item.date = newDate; 
+        save(); // И это тоже
+    }
 }
+
 function exportData() {
     const blob = new Blob([JSON.stringify(foodLog, null, 2)], {type: "application/json"});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_${getLocalISODate()}.json`; a.click();

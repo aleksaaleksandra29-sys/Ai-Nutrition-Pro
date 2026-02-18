@@ -13,7 +13,10 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥦</text></svg>">
 </head>
 <body>
+    <div class="header-area">
     <h1>🥦 Моё Питание — Умный контроль</h1>
+    <div id="syncStatus" class="sync-status">☁ Не настроено</div>
+	</div>
     
     <!-- Панель управления периодами -->
     <div class="period-filters">
@@ -31,9 +34,10 @@
         </div>
 
         <div class="action-buttons">
-            <button onclick="openAiModal()" class="ai-btn">🤖 Импорт (AI)</button>
-            <button onclick="exportData()" class="export-btn">💾 Бэкап</button>
-        </div>
+		<button onclick="openAiModal()" class="ai-btn">🤖 Импорт (AI)</button>
+		<button onclick="Cloud.setup()" class="export-btn" style="background: #f39c12;">☁ Облако</button>
+		<button onclick="exportData()" class="export-btn">💾 Бэкап</button>
+		</div>
     </div>
 
     <!-- Инфо-строка -->
@@ -144,6 +148,9 @@
         </div>
     </div>
 
+    <!-- Подключаем логику облака -->
+    <script src="cloud.js"></script> 
+    <!-- Подключаем логику приложения -->
     <script src="script.js"></script>
 </body>
 </html>

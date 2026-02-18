@@ -83,6 +83,35 @@ h2 { font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #eee; paddin
     display: block; /* Убираем flex, так как тег теперь сверху */
     margin-bottom: 5px;
 }
+.header-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sync-status {
+    font-size: 13px;
+    font-weight: 600;
+    color: #999;
+    background: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .header-area {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    .sync-status {
+        display: inline-block;
+    }
+}
 .micro-name {
     font-weight: 600;
     font-size: 14px;
