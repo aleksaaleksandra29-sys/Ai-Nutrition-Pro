@@ -107,21 +107,23 @@ function updateDisplay() {
     }
     filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-	let daysCount = 1;
+    let daysCount = 1;
     const dates = new Set(filtered.map(i => i.date));
     const actualDays = dates.size || 1;
-    const daysInMonth = new Date(currentPeriod.start.getFullYear(), currentPeriod.start.getMonth() + 1, 0).getDate();
+    const daysInMonth = currentPeriod.type === 'month' && currentPeriod.start
+        ? new Date(currentPeriod.start.getFullYear(), currentPeriod.start.getMonth() + 1, 0).getDate()
+        : 0;
 
     if (currentPeriod.type === 'week' && actualDays >= 7) 
-	{
+    {
         daysCount = 7;
     } 
-	else if (currentPeriod.type === 'month' && actualDays >= daysInMonth) 
-	{
+    else if (currentPeriod.type === 'month' && actualDays >= daysInMonth) 
+    {
         daysCount = daysInMonth;
     } 
-	else 
-	{
+    else 
+    {
         daysCount = currentPeriod.type === 'day' ? 1 : actualDays;
     }
 
@@ -140,7 +142,7 @@ function updateDisplay() {
 
     document.getElementById('val_gl').textContent = Math.round(avgs.gl);
     const na = avgs.micros["Натрий (мг)"] || 0; const k = avgs.micros["Калий (мг)"] || 1; 
-	const nak = k > 0 ? (na / k).toFixed(2) : '—';
+    const nak = k > 0 ? (na / k).toFixed(2) : '—';
     const nakEl = document.getElementById('val_nak'); nakEl.textContent = nak; nakEl.style.color = nak > 0.6 ? '#e74c3c' : '#27ae60';
     const ca = avgs.micros["Кальций (мг)"] || 0; const mg = avgs.micros["Магний (мг)"] || 1;
     document.getElementById('val_camg').textContent = (ca / mg).toFixed(2);
@@ -203,14 +205,52 @@ function renderMicroGrid(elId, configObj, currentVals) {
 }
 
 function renderList(items) {
-    const el = document.getElementById('foodList'); el.innerHTML = '';
+    const el = document.getElementById('foodList');
+    el.innerHTML = '';
+
     items.forEach(item => {
-        let microStr = item.micros ? Object.entries(item.micros).sort((a,b) => b[1] - a[1]).slice(0, 3).map(([k,v]) => `${k.split(' ')[0]} ${v}`).join(', ') : '';
+        const microStr = item.micros
+            ? Object.entries(item.micros)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([k,v]) => `${k.split(' ')[0]} ${v}`)
+                .join(', ')
+            : '';
+
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td data-label="Дата" style="color:#2980b9; cursor:pointer; font-weight:bold" onclick="editDateItem(${item.id})">✎ ${item.date}</td>
-            <td data-label="Продукт">${item.name}</td><td data-label="Ккал">${Math.round(item.cal)}</td>
-            <td data-label="Б / Ж / У">${Math.round(item.prot)} / ${Math.round(item.fat)} / ${Math.round(item.carb)}</td>
-            <td data-label="Состав">${microStr}...</td><td><button class="trash-btn" onclick="deleteItem(${item.id})">✕</button></td>`;
+
+        const dateTd = document.createElement('td');
+        dateTd.dataset.label = 'Дата';
+        dateTd.style.color = '#2980b9';
+        dateTd.style.cursor = 'pointer';
+        dateTd.style.fontWeight = 'bold';
+        dateTd.textContent = `✎ ${item.date || ''}`;
+        dateTd.addEventListener('click', () => editDateItem(item.id));
+
+        const nameTd = document.createElement('td');
+        nameTd.dataset.label = 'Продукт';
+        nameTd.textContent = item.name || '';
+
+        const calTd = document.createElement('td');
+        calTd.dataset.label = 'Ккал';
+        calTd.textContent = Math.round(item.cal || 0);
+
+        const bjuTd = document.createElement('td');
+        bjuTd.dataset.label = 'Б / Ж / У';
+        bjuTd.textContent = `${Math.round(item.prot || 0)} / ${Math.round(item.fat || 0)} / ${Math.round(item.carb || 0)}`;
+
+        const microTd = document.createElement('td');
+        microTd.dataset.label = 'Состав';
+        microTd.textContent = `${microStr}...`;
+
+        const actionTd = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'trash-btn';
+        deleteBtn.textContent = '✕';
+        deleteBtn.addEventListener('click', () => deleteItem(item.id));
+        actionTd.appendChild(deleteBtn);
+
+        tr.append(dateTd, nameTd, calTd, bjuTd, microTd, actionTd);
         el.appendChild(tr);
     });
 }
