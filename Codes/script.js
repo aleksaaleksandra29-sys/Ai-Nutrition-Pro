@@ -250,12 +250,12 @@ function renderList(items) {
             const tr = document.createElement('tr');
             tr.className = 'clickable-row';
             tr.onclick = (e) => {
-                if (!e.target.closest('.trash-btn') && !e.target.closest('[onclick^="editDateItem"]')) {
-                    showProductDetails(item.id);
+                if (!e.target.closest('.trash-btn')) {
+                    openEditModal(item.id);
                 }
             };
             tr.innerHTML = `
-                <td data-label="Дата" style="color:#2980b9; font-weight:bold" onclick="editDateItem(${item.id})">✎ ${item.date}</td>
+                <td data-label="Дата" style="color:#2980b9; font-weight:bold">✎ ${item.date}</td>
                 <td data-label="Продукт">${item.name}</td>
                 <td data-label="Ккал">${Math.round(item.cal)}</td>
                 <td data-label="Б / Ж / У">${Math.round(item.prot)} / ${Math.round(item.fat)} / ${Math.round(item.carb)}</td>
@@ -283,13 +283,46 @@ function deleteItem(id) {
     }
 }
 
-function editDateItem(id) {
-    const item = foodLog.find(i => i.id === id); if (!item) return;
-    const newDate = prompt("Дата (ГГГГ-ММ-ДД):", item.date);
-    if (newDate && /^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
-        item.date = newDate;
-        save(); // И это тоже
-    }
+let currentEditId = null;
+
+function openEditModal(id) {
+    const item = foodLog.find(i => i.id === id);
+    if (!item) return;
+    currentEditId = id;
+
+    document.getElementById('editNameInput').value = item.name;
+    document.getElementById('editDateInput').value = item.date;
+    document.getElementById('editMealTypeInput').value = item.mealType || 'Перекус';
+    document.getElementById('editCalInput').value = Math.round(item.cal) || 0;
+    document.getElementById('editProtInput').value = Math.round(item.prot) || 0;
+    document.getElementById('editFatInput').value = Math.round(item.fat) || 0;
+    document.getElementById('editCarbInput').value = Math.round(item.carb) || 0;
+    document.getElementById('editGlInput').value = Math.round(item.gl) || 0;
+
+    document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+    currentEditId = null;
+}
+
+function saveEditItem() {
+    if (currentEditId === null) return;
+    const item = foodLog.find(i => i.id === currentEditId);
+    if (!item) return;
+
+    item.name = document.getElementById('editNameInput').value;
+    item.date = document.getElementById('editDateInput').value;
+    item.mealType = document.getElementById('editMealTypeInput').value;
+    item.cal = Number(document.getElementById('editCalInput').value) || 0;
+    item.prot = Number(document.getElementById('editProtInput').value) || 0;
+    item.fat = Number(document.getElementById('editFatInput').value) || 0;
+    item.carb = Number(document.getElementById('editCarbInput').value) || 0;
+    item.gl = Number(document.getElementById('editGlInput').value) || 0;
+
+    save();
+    closeEditModal();
 }
 
 function exportData() {
